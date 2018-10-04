@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 extern crate crates_index;
 use crates_index::{Index, Version, Dependency};
@@ -39,7 +40,7 @@ fn main() {
 		index.retrieve().expect("Could not retrieve crates.io index");
     }
 
-	// Find crate for checking and load available versions
+	// Find crate for checking and load available versions for cross referencing
 	let check_crate = index.crates().find(|c| c.name() == dependency)
 		.expect("Dependency not found");
 	let mut check_versions: Vec<VersionNo> = check_crate.versions().iter().map(|v| VersionNo::parse(v.version()).unwrap() ).collect();
@@ -65,31 +66,43 @@ fn main() {
 
     // Generate maps of version requirements and resolutions
     let mut requirement_map: HashMap<VersionReq, u32> = HashMap::new();
-	let mut resolved_map: HashMap<VersionNo, u32> = HashMap::new();
+	let mut feature_map: HashMap<String, u32> = HashMap::new();
+	let mut resolved_map: HashMap<VersionNo, (u32, HashMap<String, u32>)> = HashMap::new();
+
     let _: Vec<()> = deps.iter().map(|d| {
+		// Build requirements map
 		let requirement = VersionReq::parse(&d.requirement().to_string()).unwrap();
     	*requirement_map.entry(requirement.clone()).or_insert(0) += 1;
 
+		// Build resolved version and feature maps
 		let resolved = check_versions.iter().find(|v| requirement.matches(v) ).unwrap();
-		*resolved_map.entry(resolved.clone()).or_insert(0) += 1;
-    }).collect();
 
-	let mut requirement_list: Vec<(VersionReq, u32)> = requirement_map.iter().map(|(r, n)| (r.clone(), n.clone())).collect();
-	requirement_list.sort_by(|a, b| a.0.cmp(&b.0) );
-
-	let mut resolved_list: Vec<(VersionNo, u32)> = resolved_map.iter().map(|(f, n)| (f.clone(), n.clone())).collect();
-	resolved_list.sort_by(|a, b| a.0.cmp(&b.0) );
-
-	// Generate map of feature flags
-	let mut feature_map: HashMap<String, u32> = HashMap::new();
-    let _: Vec<()> = deps.iter().map(|d| {
+		resolved_map.entry(resolved.clone()).or_insert((0, HashMap::new()));
+		let mut dep_entry = resolved_map.remove(&resolved.clone()).unwrap();
+		
+		dep_entry.0 += 1;
 		for flag in d.features() {
 			*feature_map.entry(flag.clone()).or_insert(0) += 1;
+			*dep_entry.1.entry(flag.clone()).or_insert(0) += 1;
 		}
+
+		resolved_map.insert(resolved.clone(), dep_entry);
+
     }).collect();
+
+	// Convert maps to lists for sorting and display
+	let mut requirement_list: Vec<(VersionReq, u32)> = requirement_map.iter().map(|(r, n)| (r.clone(), n.clone())).collect();
+	requirement_list.sort_by(|a, b| {
+		let a = a.0.to_string().replace("><=~^", "");
+		let b = b.0.to_string().replace("><=~^", "");
+		a.cmp(&b)
+	});
 
 	let mut feature_list: Vec<(String, u32)> = feature_map.iter().map(|(f, n)| (f.clone(), n.clone())).collect();
 	feature_list.sort_by(|a, b| a.0.cmp(&b.0) );
+
+	let mut resolved_list: Vec<(VersionNo, (u32, Vec<(String, u32)>))> = resolved_map.iter().map(|(f, v)| (f.clone(), (v.0.clone(), v.1.iter().map(|(f, n)| (f.clone(), n.clone()) ).collect()))).collect();
+	resolved_list.sort_by(|a, b| a.0.cmp(&b.0) );
 
 	// Show outputs
 	println!("");
@@ -103,16 +116,21 @@ fn main() {
 				n as f64 / total_deps as f64 * 100.0);
 	}
 
-	println!("Resolved version:");
-	for (r, n) in resolved_list {
-		println!("\t{}:\t{:4} / {} ({:.2} %)", r, n, total_deps, 
-				n as f64 / total_deps as f64 * 100.0);
-	}
-
 	println!("Features:");
 	for (f, n) in feature_list {
 		println!("\t{}:\t{:4} / {} ({:.2} %)", f, n, total_deps, 
 				n as f64 / total_deps as f64 * 100.0);
+	}
+
+
+	println!("Resolved versions and features:");
+	for (r, v) in resolved_list {
+		println!("\t{}:\t{:4} / {} ({:.2} %)", r, v.0, total_deps, 
+				v.0 as f64 / total_deps as f64 * 100.0);
+		for (f, n) in v.1 {
+			println!("\t\t{}:\t{:4} / {} ({:.2} %)", f, n, v.0, 
+				n as f64 / v.0 as f64 * 100.0);
+		}
 	}
 
 	println!("");
