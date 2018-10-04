@@ -4,7 +4,7 @@ description = "A smol utility to evaluate the dependency versions and features f
 repository = "https://github.com/ryankurte/rust-dep-check"
 version = "0.1.0"
 authors = ["Ryan Kurte <ryankurte@gmail.com>"]
-license = "GPLv3"
+license = "GPL-3.0-or-later"
 
 [dependencies]
 crates-index = "0.12.0"
