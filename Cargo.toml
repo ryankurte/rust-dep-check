@@ -1,7 +1,10 @@
 [package]
 name = "dep-check"
+description = "A smol utility to evaluate the dependency versions and features for a given crates.io package"
+repository = "https://github.com/ryankurte/rust-dep-check"
 version = "0.1.0"
 authors = ["Ryan Kurte <ryankurte@gmail.com>"]
+license = "GPLv3"
 
 [dependencies]
 crates-index = "0.12.0"
