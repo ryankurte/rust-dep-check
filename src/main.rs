@@ -1,3 +1,8 @@
+// Rust Dependency Checker
+// 
+// https://github.com/ryankurte/rust-dep-check
+// Copyright 2018 Ryan Kurte
+
 use std::collections::HashMap;
 
 extern crate crates_index;
@@ -12,6 +17,7 @@ use semver::Version as VersionNo;
 
 fn main() {
     let matches = App::new("Crates.io dependency analyser")
+		.author("Ryan Kurte <ryan@kurte.nz>")
 		.arg(Arg::with_name("dependency")
 			.help("Dependency to filter on")
 			.required(true))
