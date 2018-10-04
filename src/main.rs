@@ -16,10 +16,10 @@ use semver::{VersionReq};
 use semver::Version as VersionNo;
 
 fn main() {
-    let matches = App::new("Crates.io dependency analyser")
+    let matches = App::new("Crates.io package dependency analyser")
 		.author("Ryan Kurte <ryan@kurte.nz>")
 		.arg(Arg::with_name("dependency")
-			.help("Dependency to filter on")
+			.help("Package to analyse")
 			.required(true))
 		.arg(Arg::with_name("reindex")
 			.short("r")
@@ -28,7 +28,7 @@ fn main() {
 		.arg(Arg::with_name("index-dir")
 			.long("index-dir")
 			.takes_value(true)
-			.help("Directory with crates.io index")
+			.help("Directory for crates.io index")
 			.default_value("_index"))
 		.get_matches();
 
