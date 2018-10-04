@@ -1,0 +1,8 @@
+[package]
+name = "dep-check"
+version = "0.1.0"
+authors = ["Ryan Kurte <ryankurte@gmail.com>"]
+
+[dependencies]
+crates-index = "0.12.0"
+clap = "2.32.0"
