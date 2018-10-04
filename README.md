@@ -1,11 +1,12 @@
 # rust-dep-check
 
-A smol utility to check for dependencies on a package from crates.io and the feature flags they're using.
+A smol utility to check for dependencies on a package from crates.io and the feature flags they're using to help manage breaking changes and feature-flag based migration across the crates.io ecosystem.
 
 ## Usage
 
 Run with `dep-check CRATE_NAME`, print help with `dep-check -h`.
 
+### Help
 ```
 Crates.io dependency analyser
 Ryan Kurte <ryan@kurte.nz>
@@ -25,6 +26,7 @@ ARGS:
     <dependency>    Dependency to filter on
 ```
 
+### Example Output
 ```
 > dep-check embedded-hal
 
