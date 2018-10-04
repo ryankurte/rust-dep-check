@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 
 extern crate crates_index;
 use crates_index::{Index, Version, Dependency};
@@ -14,11 +13,8 @@ use semver::Version as VersionNo;
 fn main() {
     let matches = App::new("Crates.io dependency analyser")
 		.arg(Arg::with_name("dependency")
-			.short("d")
-			.long("depencency")
 			.help("Dependency to filter on")
-			.default_value("embedded-hal")
-			.takes_value(true))
+			.required(true))
 		.arg(Arg::with_name("reindex")
 			.short("r")
 			.long("reindex")
