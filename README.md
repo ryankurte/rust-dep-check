@@ -8,7 +8,7 @@ Run with `dep-check CRATE_NAME`, print help with `dep-check -h`.
 
 ### Help
 ```
-Crates.io dependency analyser
+Crates.io package dependency analyser
 Ryan Kurte <ryan@kurte.nz>
 
 USAGE:
@@ -20,10 +20,10 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --index-dir <index-dir>    Directory with crates.io index [default: _index]
+        --index-dir <index-dir>    Directory for crates.io index [default: _index]
 
 ARGS:
-    <dependency>    Dependency to filter on
+    <dependency>    Package to analyse
 ```
 
 ### Example Output
